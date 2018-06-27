@@ -1,0 +1,25 @@
+{
+  "name": "beanazon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "beanazonCustomer.js",
+  "dependencies": {
+    "inquirer": "^6.0.0",
+    "mysql": "^2.15.0",
+    "npm": "^6.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamiereaves/beanazon.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jamiereaves/beanazon/issues"
+  },
+  "homepage": "https://github.com/jamiereaves/beanazon#readme"
+}
