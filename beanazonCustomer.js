@@ -30,16 +30,30 @@ function queryBeans(){
     connection.query("SELECT * FROM products", function (err, res) {
         if (err) throw err;
         resLength = res.length + 1;
-        console.log("=============================================================================================");
-        for (var i = 0; i<res.length; i++){
+        iDarray = [];
+        stockCounter = [];
+        productChoices =[];
+        priceList = [];
+        console.log("================================================================================================================");
+        console.log("                      WELCOME TO BEANAZON, THE INTERNET'S PREMIER BEAN RETAILER")
+        console.log("================================================================================================================");
+        if (res.length > 9){
+        for (var i = 0; i < 9; i++){
+            console.log("beanazon product ID: " + res[i].item_id + "  || " + res[i].product_name + " | " + res[i].department_name + " | $" + res[i].price + " per kg | quantity available: " + res[i].stock_quantity + " kg");
+            iDarray.push(res[i].item_id);
+            stockCounter.push(res[i].stock_quantity);
+            productChoices.push(res[i].product_name);
+            priceList.push(res[i].price);
+            }
+        for (var i = 9; i < res.length; i++){
             console.log("beanazon product ID: " + res[i].item_id + " || " + res[i].product_name + " | " + res[i].department_name + " | $" + res[i].price + " per kg | quantity available: " + res[i].stock_quantity + " kg");
             iDarray.push(res[i].item_id);
             stockCounter.push(res[i].stock_quantity);
             productChoices.push(res[i].product_name);
             priceList.push(res[i].price);
-
-        }
-        console.log("=============================================================================================");
+            }
+        } 
+        console.log("================================================================================================================");
         start();
     })  
 }
@@ -64,7 +78,7 @@ function start() {
                 type: "input",
                 message: "Please enter the quanity you'd like to purchase.",
                 validate: function(value) {
-                    if (isNaN(value) === false && value > 0) {
+                    if (isNaN(value) === false && value >= 1) {
                       return true;
                     }
                     return false;
@@ -73,7 +87,7 @@ function start() {
             }
         ])
         .then(function(answer) {
-           
+            selectionArray = [];
             for (i=0; i < iDarray.length; i++) {
                 if (parseInt(iDarray[i]) === parseInt(answer.itemID)) {
                     selectionArray.push(parseInt(iDarray[i]));
@@ -84,7 +98,7 @@ function start() {
             }
 
             if (parseInt(answer.quantity) > parseInt(selectionArray[2])) {
-                console.log("Sorry, we don't have enough " + selectionArray[1] + " in stock to fulfill your order");
+                console.log("Sorry, we don't have enough " + selectionArray[1].toLowerCase() + " in stock to fulfill your order");
                 endgame();
             }
             
@@ -94,7 +108,7 @@ function start() {
                 "UPDATE products SET ? WHERE ?",
                 [
                   {
-                    stock_quantity: parseInt(stockCounter[parseInt(answer.itemID - 1)]) - parseInt(answer.quantity)
+                    stock_quantity: parseInt(selectionArray[2]) - parseInt(answer.quantity)
                   },
                   {
                     item_id: parseInt(answer.itemID)
@@ -102,9 +116,10 @@ function start() {
                 ],
                 function(err) {
                   if (err) throw err;
-                  console.log(selectionArray[3] * parseInt(answer.quantity));
-                  console.log("You have purchased " + answer.quantity + " kg of " + selectionArray[1] + 
-                  " & your account has been charged $" + selectionArray[3] * parseInt(answer.quantity) + 
+                  var cost = selectionArray[3] * parseInt(answer.quantity);
+                  selectionArray[2] = parseInt(selectionArray[2]) - parseInt(answer.quantity);
+                  console.log("You have purchased " + answer.quantity + " kg of " + selectionArray[1].toLowerCase() + 
+                  " & your account has been charged $" + cost.toFixed(2) + 
                   ". Thanks for shopping with beanazon!!");
                   endgame();
                 }
