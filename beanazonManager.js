@@ -24,7 +24,6 @@ connection.connect(function(err){
     //deal with errors if any
     if (err) throw err;
     //run the managerOptions function
-    setGlobalVars();
     managerOptions();
 });
 
@@ -47,12 +46,13 @@ function setGlobalVars() {
     }
 
 function managerOptions() {
+    setGlobalVars();
     inquirer
       .prompt({
         name: "optionsList",
         type: "list",
         message: "What would you like to do?",
-        choices: ["View Inventory", "View Low Inventory Items", "Add to Inventory", "Add a New Product"]
+        choices: ["View Inventory", "View Low Inventory Items", "Add to Inventory", "Add a New Product", "Exit"]
       })
       .then(function(answer) {
         // based on their answer, either call the appropriate function
@@ -66,8 +66,11 @@ function managerOptions() {
             viewProducts2();
             setTimeout(addToInventory, 300);
         }
-        else {
+        else if (answer.optionsList === "Add a New Product") {
             addNewProduct();
+        }
+        else{
+            endgame();
         }
       });
   }
@@ -155,18 +158,18 @@ function managerOptions() {
             if (res.length > 9){
                 for (var i = 0; i < 9; i++){
                     if (res[i].stock_quantity <= 5){
-                    console.log("beanazon product ID: " + res[i].item_id + "  || " + res[i].product_name + " | " + res[i].department_name + " | $" + res[i].price + " per kg | quantity available: " + res[i].stock_quantity + " kg");
+                    console.log("beanazon product ID: " + res[i].item_id + "  || " + res[i].product_name + " | quantity available: " + res[i].stock_quantity + " kg");
                         }
                     }
                 for (var i = 9; i < res.length; i++){
                     if (res[i].stock_quantity <= 5){
-                        console.log("beanazon product ID: " + res[i].item_id + "  || " + res[i].product_name + " | " + res[i].department_name + " | $" + res[i].price + " per kg | quantity available: " + res[i].stock_quantity + " kg");
+                        console.log("beanazon product ID: " + res[i].item_id + "  || " + res[i].product_name + " | quantity available: " + res[i].stock_quantity + " kg");
                         }
                     }
                 }
             else {
                 for (var i = 0; i < res.length; i++){
-                    console.log("beanazon product ID: " + res[i].item_id + " || " + res[i].product_name + " | " + res[i].department_name + " | $" + res[i].price + " per kg | quantity available: " + res[i].stock_quantity + " kg");
+                    console.log("beanazon product ID: " + res[i].item_id + " || " + res[i].product_name + " | quantity available: " + res[i].stock_quantity + " kg");
                     }
                 } 
             
@@ -235,16 +238,78 @@ function addToInventory() {
                   //update the stock in the selectionArray.
                   selectionArray[2] = parseInt(selectionArray[2]) + parseInt(answer.quantity);
                   //inform user of the success of the order and give them a summary of the relevant order details.
-                  console.log("You have added " + answer.quantity + " kg of " + selectionArray[1].toLowerCase() + 
+                  console.log("You have added " + parseInt(answer.quantity) + " kg of " + selectionArray[1].toLowerCase() + 
                   " to the inventory.  There are currently " + selectionArray[2] + " kg of " + selectionArray[1].toLowerCase() + " in stock.");
                   //call function that allows user to choose to continue or exit the application.
-                  managerOptions();
+                  setGlobalVars()
+                  setTimeout(managerOptions, 300);
                 }
               );
             
             }    
           
         )};
+
+// function to handle adding new items to the store
+function addNewProduct() {
+    // prompt for info about the item being added
+    inquirer
+      .prompt([
+        {
+          name: "item",
+          type: "input",
+          message: "Please enter the name of the bean you would like to add to the store:"
+        },
+        {
+          name: "category",
+          type: "list",
+          message: "What is the region of origin for this bean?",
+          choices: ["Africa", "Asia", "Europe", "North America", "South America"]
+        },
+        {
+          name: "askingPrice",
+          type: "input",
+          message: "How much will we charge per kg for this bean?",
+          validate: function(value) {
+            if (isNaN(value) === false && value >= 0 ){
+              return true;
+            }
+            return false;
+          }
+        },
+        {
+            name: "initialStock",
+            type: "input",
+            message: "How many kg will we stock initially?",
+            validate: function(value) {
+              if (isNaN(value) === false && value >= 0) {
+                return true;
+              }
+              return false;
+            }
+          }
+      ])
+      .then(function(answer) {
+          var newPrice = parseFloat(answer.askingPrice);
+          var initStock = parseInt(answer.initialStock);
+        // when finished prompting, insert a new item into the db with that info
+        connection.query(
+          "INSERT INTO products SET ?",
+          {
+            product_name: answer.item,
+            department_name: answer.category,
+            price: newPrice.toFixed(2),
+            stock_quantity: initStock
+          },
+          function(err) {
+            if (err) throw err;
+            console.log("You have added " + initStock + " kg of " + answer.item.toLowerCase() + " to the store inventory.");
+            setGlobalVars()
+            setTimeout(managerOptions, 300);
+          }
+        );
+      })
+  }
 
   //function that allows user to either place another order, or exit the app
 function endgame() {
@@ -253,16 +318,16 @@ function endgame() {
       .prompt({
         name: "continue",
         type: "confirm",
-        message: "Would you like to continue?",
+        message: "Are you sure you want to exit the manager menu?",
         })
         .then(function(answer) {
         // based on their answer, either run queryBeans function (i.e. start over) or end the connection and exit the app
         if (answer.continue === true) {
-            managerOptions();
-        }
-        else{
             connection.end();
             return;
+        }
+        else{
+            managerOptions();
         }
         });
     }
