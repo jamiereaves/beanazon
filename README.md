@@ -17,4 +17,4 @@ Beanazon is a storefront app built with mysql and node.js that takes orders for 
 
 ## Future Additions
 
-I am working on the manager and supervisor apps and will update the readme as the apps are completed.
+I was able to add the View All Products, View Low Inventory, Add to Inventory functions to the beanazonManager.js app, but haven't been able to add screenshots and updated descriptions to the readme before the submission deadline.  Will add the last function and update the readme asap.

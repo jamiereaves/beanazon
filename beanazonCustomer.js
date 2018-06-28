@@ -39,24 +39,34 @@ function queryBeans(){
         console.log("================================================================================================================");
         console.log("                      WELCOME TO BEANAZON, THE INTERNET'S PREMIER BEAN RETAILER")
         console.log("================================================================================================================");
-        //added code to make sure 1 and 2 digit item id's display uniformly to ease user interface. could be expanded if a sufficient 
-        //number of items are added to generate 3 digit id's. these for loops also populate arrays that hold product data for use in the next function.
+        //added code to make sure 1 and 2 digit item id's display uniformly to ease user interface (by adding a space to 1 digit numbers so the double lines all line up).
+        //could be expanded if a sufficient number of items are added to generate 3 digit id's. these for loops also populate arrays that hold product data for use in the next function.
         if (res.length > 9){
-        for (var i = 0; i < 9; i++){
-            console.log("beanazon product ID: " + res[i].item_id + "  || " + res[i].product_name + " | " + res[i].department_name + " | $" + res[i].price + " per kg | quantity available: " + res[i].stock_quantity + " kg");
-            iDarray.push(res[i].item_id);
-            stockCounter.push(res[i].stock_quantity);
-            productChoices.push(res[i].product_name);
-            priceList.push(res[i].price);
-            }
-        for (var i = 9; i < res.length; i++){
-            console.log("beanazon product ID: " + res[i].item_id + " || " + res[i].product_name + " | " + res[i].department_name + " | $" + res[i].price + " per kg | quantity available: " + res[i].stock_quantity + " kg");
-            iDarray.push(res[i].item_id);
-            stockCounter.push(res[i].stock_quantity);
-            productChoices.push(res[i].product_name);
-            priceList.push(res[i].price);
-            }
+            for (var i = 0; i < 9; i++){
+                console.log("beanazon product ID: " + res[i].item_id + "  || " + res[i].product_name + " | " + res[i].department_name + " | $" + res[i].price + " per kg | quantity available: " + res[i].stock_quantity + " kg");
+                iDarray.push(res[i].item_id);
+                stockCounter.push(res[i].stock_quantity);
+                productChoices.push(res[i].product_name);
+                priceList.push(res[i].price);
+                }
+            for (var i = 9; i < res.length; i++){
+                console.log("beanazon product ID: " + res[i].item_id + " || " + res[i].product_name + " | " + res[i].department_name + " | $" + res[i].price + " per kg | quantity available: " + res[i].stock_quantity + " kg");
+                iDarray.push(res[i].item_id);
+                stockCounter.push(res[i].stock_quantity);
+                productChoices.push(res[i].product_name);
+                priceList.push(res[i].price);
+                }
         } 
+
+        else {
+            for (var i = 0; i < res.length; i++){
+                console.log("beanazon product ID: " + res[i].item_id + " || " + res[i].product_name + " | " + res[i].department_name + " | $" + res[i].price + " per kg | quantity available: " + res[i].stock_quantity + " kg");
+                iDarray.push(res[i].item_id);
+                stockCounter.push(res[i].stock_quantity);
+                productChoices.push(res[i].product_name);
+                priceList.push(res[i].price);
+                }
+            } 
         console.log("================================================================================================================");
         //start function is called
         start();
